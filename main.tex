@@ -44,13 +44,13 @@
 \begin{document}
 
 % paper title
-\title{Automatic tuning of adaptive PID controllers using an artificial neural network}
+\title{Automatic Tuning of adaptive PID Controllers using an Artificial Neural Network}
 
 
 % author names and affiliations
 % use a multiple column layout for up to three different
 % affiliations
-\author{\IEEEauthorblockN{Soleiman N. Anwary, Charles Rigby}
+\author{\IEEEauthorblockN{Soleiman N. Anwary, Charles W. Rigby}
 \IEEEauthorblockA{Department of Process Systems Engineering, Imperial College London\\
 \{sna314, cwr17\}@imperial.ac.uk}
 }
@@ -61,42 +61,31 @@
 \maketitle
 
 \begin{abstract}
-Although the analysis of data is a task that has gained the interest of the statistical community in recent years and whose familiarity with the statistical computing environment, they encourage the current statistical community (to students and teachers of the area) to complete statistical analysis reproducible by means of the tool R.
-However for years there has been a gap between the calculation of matrices on a large scale and the term "big data", in this work the Normalized Cut algorithm for images is applied. Despite the expected, the R environment to do image analysis is poorly, in comparison with other computing platforms such as the Python language or with specialized software such as OpenCV \cite {OpenCV}. \\
-Being well known the absence of such function, in this work we share an implementation of the Normalized Cut algorithm in the R environment with extensions to programs and processes performed in C ++, to provide the user with a friendly interface in R to segment images. The article concludes by evaluating the current implementation and looking for ways to generalize the implementation for a large scale context and reuse the developed code.
+Process control is an integral part of process systems anywhere in large scale production processes to applications in robotic devices. Specifically, we are interested in systematic control of bioprocesses due to their presence in sustainable generation of fossil-fuel alternatives. These systems are highly non-linear and display stochastic behaviour not easily modelled, creating a disparity in the plant-wide dynamics and model dynamics [Rio Del Chanona]. In this paper we investigate a black-box optimisation method through the use of a surrogate model to approximate the system dynamics and tune PID controller parameters through an gradient descent optimisation algorithm. We show that PID tuning parameters can be optimised for linear and non-linear systems without he intervention of manual methodologies such as Ziegler-Nichols or Cohen-Coon. We extended this model to multiple controllers whereby the surrogate model allowed communication between the the PID controller nodes in the artificial neural network. This multiple input and multiple output (MIMO) model is able to optimise PID controls for two different states of a system to various set point values for linear and non-linear systems so they reach stability given controllable system dynamics. 
 
-\textit{Key words: Normaliced Cut, image segmentation, Lanczos algorithm, eigenvalues and eigenvectors, graphs, similarity matrix, R (the statistical computing environment), open source, large scale and big data.}\end{abstract}
+\noindent \textit{Key words: Black-box, artificial neural network, process control, PID, tuning, control, Ziegler-Nichols, Cohen-Coon, surrogate model, deep reinforcement learning, Q-learning, MIMO, optimisation}\end{abstract}
 
 \IEEEpeerreviewmaketitle
 
 
-\section{Introduction and motivation}
+\section{Introduction \& Motivation}
+\noindent The topic of research considered in this paper covers a wide range of disciplines including process control, optimal control, black-box optimisation (BBO) and machine learning. Process feedback control dates back all the way to the third century BC. During this period Ktesibios of Alexandria employed a float valve to regulate the level in the water clocks used at that time [1]. Over the course of the subsequent centuries there was some development in process control, but it wasn’t until the industrial revolution that process control became widely utilised. The digital revolution coupled with the work of Russian American scientist Nicolas Minorsky on a formal control law (today known as PID control) [2] allowed for the development of modern computational control technologies which are used almost universally today in all process systems. Optimal control theory attempts to find a control law for a dynamical system that enables the system to perfectly respond to changes and disturbances. Ensuring optimal control is not straightforward and historically a large amount of effort has gone into designing approaches to solve this problem. Many of the systems that arise in chemical engineering problems are non-linear in nature [3]. This poses a problem when considering the control of such systems, as we may not have an easily tractable analytical expression that describes their responses to variations in the operating conditions. In this paper we aimed to address this problem by producing an algorithm which can find the optimal PID parameters to control a black-box system which is, by definition, a priori unknown. \\
+Black-Box optimisation methods are used in machine learning to find the minimum value of a real valued function that has no readily available analytical form. There are a wide variety of different BBO methods available including Genetic algorithms [4] and Particle Swarm algorithms [5]. The problem that we attempt to solve in the research paper can be described in its simplest form as follows: How can the optimum parameters to tune a PID controller for a black-box process system be found in an automated and systematic way? \\
+This is a vital problem to solve because an effectively tuned controller can provide a myriad of benefits in the operation of a process system. These benefits include but are not limited to ensuring product quality is maintained during operation by minimising the effects of process disturbances, establishing and maintaining process safety during operation and mitigating the time required, and the effects of, process start-up and shutdown. As the demands on the process industries grow over the coming years to serve an ever growing and increasingly affluent population, more energy and product wastage will occur in absolute terms. This highlights the importance of effective controller operation, and by extension controller tuning, as even small margins of unnecessary loss projected across time can lead to large unrealised profits for companies. Methods such as Ziegler-Nichols [6] and Cohen-Coon tuning [7] have been traditionally used to tune process controllers. Today these methods are  antiquated as they are time consuming and the controller parameters produced are generally not optimal. Currently in industry control engineers are increasingly turning to computational methods to optimise their control systems. Many of these methods rely on a knowledge of the physical system which for chemical engineering applications is generally unrealistic as the processes are highly complex in nature. Black-box optimisation methods can be exploited to provide a solution to this problem. In this research project we have considered a polynomial regression algorithm which approximates the true function by fitting a convex surrogate function. We can then apply a derivative based gradient descent to the surrogate function to determine the optimum point. To evaluate the effectiveness of this method requires us to consider the ease of implementation, the robustness of the method as well as how the dynamic system response is for the optimum tuning parameters.\\
 
-
-
-The statistical recognition of patterns, and in particular the analysis of images, is a stimulating field of study where statistics and computer science coexist. In recent years the environment of statistical computing and programming language R \cite{R} has increased its presence in statistical analysis and is even used in big data contexts, on the other hand, image analysis is an area that continues to motivate investigation.\\
-As a counterpoint to what is expected, since image analysis uses different statistical learning techniques (both supervised and non-supervised), the R environment has few tools for image analysis, as can be seen when reviewing the entry of 'MedicalImaging' in its Task View, in front of other specialized tools such as OpenCV \cite{OpenCV}. On the other hand, there are scientific computing environments that integrate some tools to analyze images, but their capacities are reflected in their commercial price, for example MatLab \cite{MatLab}. \\
-%%%%%
-The above, together with the fact that image segmentation is a final objective and sometimes only an intermediate step in other investigations, in this work an image segmentation application is developed using the Normalized Cut algorithm, which we will refer to in the following as \textit{Ncut}. In order to provide users and developers of the R language with an implementation of the \textit{Ncut} algorithm (which does not exist in OpenCV and other scientific computing environments), two programs were coded; each contains a file with extension .R that determines it as an R language code as well as a file with extension .cpp that is a C ++ language code that uses stable C ++ language libraries to perform calculations and optimal storage of matrices;
-one for grayscale images and one for RGB images available in the github author's personal \cite{github}  \url{https://github.com/fou-foo/MCE/tree/master/Second/AnalisisNumericoYOptimizacion/Miniproyecto} respectively the files are ''W\_float.cpp'' and ''mini\_cut\_float.R'' for grayscale images and ''W\_RGB\_float.cpp'' and ''mini\_Ncut\_RGB\_float.R'' for images on RGB channels (which is easily adaptable to images with more channels). Details on implementation are discussed in the last subsection of section ''II. Workflow ''of this report. \\
-With the above, an easy-to-use open-source tool is provided, particularly in the R environment, although the .cpp code can be exported to other computing environments, for the Ncut algorithm, which provides the basis for future statistical computing developments. The product developed allowed to segment a set of images from the personal profile of the author of the Facebook \cite{Facebook} platform, whose results are reported in this work. \\
-The organization of the present work is as follows: in the section 'II. Workflow" is explained in a general way in which the Ncut algorithm that was used in this work consists, as well as its relation with the Lanczos algorithm, later the implementation of the algorithm is detailed so that it is easy to use in the R environment.In the section ''III. RELATED WORKS'' we report the research carried out on the lack of implementations of both the Ncut algorithm and the Lanczos algorithm in different architectures (which makes the need for an own implmentation tangible) such as tools dedicated to the big data context (such as Apache Hadoop \cite{Hadoop} and Apache Spark \cite{Spark}) where the author sees an area of opportunity for massive image analysis, on the other hand, in large-scale matrices there are implementations in MPI such as ScaLAPACK \cite{ScaLAPACK} of the Lanczos algorithm, however, they do not implement higher-level routines such as Ncut. We conclude this section by commenting on tools that we consider medium-term to be useful for large-scale scientific computing such as the programming language Elixir \cite{Elixir}. \\
-Then in the section "IV. Experiments and Results" are shown (and in some images are detailed) the results of the image segmentation realized with the own implementation. The section concludes with the benefits and limitations of the implementation to obtain a "good" image segmentation. Later in the section "V. Conclusions" we summarize the discoveries learned and evaluate the methodology used. Finally, the "Appendix" section proposes future works of improvement of the implementation, within the open-source context, to segment images of greater resolution and size to those addressed in this work, as well as the possible extension to other statistical learning techniques with the purpose of reusing the code already developed and future. \\
-
-
+The objectives of this research are primarily to have a robust algorithm which can be applied to determine the optimal control parameters for a wide range of systems. To do this we will consider a description of the proposed algorithm which provides the solution, an evaluation of the solution and a discussion of the algorithm performance and finally considerations about potential future improvements.
 
 \section{Methods}
 
 \section{Mathematical and Computational Aspects}
-We are addressing the problem of tuning parameter optimisation using a surrogate machine learning model. We are using a quadratic approximation to the actual dynamics of the system. For this problem to be soluble the surrogate model has to be convex and all the constraints must also be convex such that the problem overall is convex. \\
+\noindent We are addressing the problem of tuning parameter optimisation using a surrogate machine learning model. We are using a quadratic approximation to the actual dynamics of the system. For this problem to be soluble the surrogate model has to be convex and all the constraints must also be convex such that the problem overall is convex. \\
 \theoremstyle{definition}
 \begin{definition}
 \textit{A function f}: $\mathbb{R}^n \rightarrow \mathbb{R}$ \textit{is convex if and only if its domain is a convex set $\forall$ $x, y$ and all $\lambda \in [0,1]$. } 
 \end{definition}
-
-A multivariate quadratic function such as the surrogate model
+\noindent A multivariate quadratic function such as the surrogate model
 \begin{equation}
-    f(x) = x^TQx + c^Tx,
+    f(x) = \mathbf{k}^TQ\mathbf{k} + c\mathbf{k}^T,
 \end{equation}
 is convex if and only if $Q \succcurlyeq 0$. This is important because it means that the quadratic coefficients of the surrogate model have to be constrained to non-negative values. So by defining Q to be a symmetric matrix and the constraining the quadratic term coefficients to be non-negative we ensure all eigenvalues of the matrix are positive and as such the matrix $Q$ is positive semi-definite which keeps the optimisation problem convex. Most importantly, a convex system means any local minimum found is also a global minimum. 
 
@@ -107,7 +96,7 @@ is convex if and only if $Q \succcurlyeq 0$. This is important because it means 
 
 When optimising a control system we first had to segment the problem. The majority of dynamic systems are controllable using a P and I control system [Reference]. With this in mind, we pose the hypothesis: the algorithm should come to the conclusion that the majority of systems tested are PI-controllable. Indeed what we observed was that both linear and non-linear system dynamics were controllable and converged onto a set point; a number of set points were used to test model robustness and in each case the model presented a converging system response. We can see Figure X shows system responses for the optimal set of tuning parameters, $k_p$ and $k_i$  as determined by the surrogate model optimisation. Several iterations of the model were plotted on the same axis to show how the algorithm parses through the mesh of tuning parameters generated. The darker lines represent later iterations and the latest updates to the optimal response. The following were used as benchmark dynamic systems to test the model performance:
 \begin{equation}
-\frac{dx}{dt} = 2x +u \quad \textrm{and} \quad \frac{dx}{dt} = x^2 + u
+\dot{x} = 2x +u \quad \textrm{and} \quad \dot{x} = x^2 + u
 \end{equation}
 It is important to note the algorithm is designed to work on unknown system dynamics; the outputs of the system would be gathered and fed into the algorithm as an input. This would be used by the model to fit an approximate surrogate function and find the optimal tuning parameters.\\
 The cost function $\phi$ is evaluated at each iteration and plotted over the parameter vector space to visualise the surface. We do this in a 3-dimensional plot of $k_p$ against $k_i$ and $\phi$. The value of $\phi$ is broken into percentiles and categorised in the plot using a continuous colour scale. It can be seen the cost function $\phi$ predicts the optimal value of $\boldsymbol \pi$ to be in the region with low $k_i$ and high $k_p$ values. The sample space in the parameter mesh is cubic and this is seen in the plot. The surrogate function $\phi_{approx}$ predicts the optimal $\boldsymbol \pi$ to be at $(5,5)$. This is not completely consistent with what the cost function predicts. This may be because the surrogate model is sampled far more around that point and as such a greater weight is given for that set of values as the optimum $\boldsymbol \pi$ [CLARIFY THIS WITH ANTONIO]. A higher density plot of phi was generated to test this and indeed the optimum predicted by the surrogate function moved closer to the darker red region where $\phi$ is minimised [figure reference].
@@ -120,7 +109,6 @@ We investigated the agreement between the surrogate function $\phi_{approx}$ and
 We extended the PI-control parameter optimisation to the 3D case by also considering a derivative term, $k_d$. Figure X shows various system dynamics and how the model handled the optimisation to achieve a steady state system response for both linear and non-linear system dynamics. Once again we used several set point values to test the model and system response convergence. All tests showed the model successfully corrected for the step input error and brought the system back to the set point. There are several values of $\boldsymbol \pi$ which led to a sub-optimal response where the system slowly diverged from the set point. However, the last batch of iterations show that the most intensely coloured blue lines belong to the group of $\boldsymbol \pi$ solutions which yield a steady state system response. It was also important to understand how the cost function behaved across the parameter space. Figure X shows a 4-dimensional plot of the parameters $k_p, k_i, k_d$ and the value of $\phi$ normalised as a percentile as the 4\ts{th} dimension which is shown as colour in this instance. We can see that once again a high value of $k_p$ and low but non-zero values of $k_i$ are preferred by the model for linear and simple non-linear dynamics. The parameter $k_d$ is often very close to or in fact \textit{zero}. This reinforces the model's PI-control preference; it suggests that a proportional gain and a small integral error correction mode are sufficient to control most systems effectively. Furthermore, the surrogate approximate function $\phi_{approx}$ attempts to find optimal values for $\boldsymbol \pi$ in the region where the derivative term is zero, and the proportional and integral terms are equal because the model samples heavily in that region. This suggests that there is a compromise that has to be achieved for the surrogate model. It can either try to approximate the system dynamics in small local spaces which would improve the fit between $\phi$ and $\phi_{approx}$ or it can approximate the dynamics globally which means that $\phi_{approx}$ cannot be accurate across the whole domain. The model is designed to be memoryless - upon each iteration the model does not retain any state space variables describing the system or the tuning parameters which were used in the previous iteration prior to bound reduction. As a result, the approximate surrogate function inherently will not be able to approximate the system dynamics equally well over the entire space. 
 
 \subsection{Multiple Input Multiple Output Control System (MIMO)}
-
 When designing the control algorithm it was important to consider use-case scenarios for its application. One such use-case is in biochemical processes. Biochemical processes utilise biological microorganisms to produce chemical derivatives and high-value products otherwise too complicated to obtain through physical chemical modes. However, the complex interactions between the substrates in metabolic pathways and the culture fluid dynamics makes bioprocess control particularly challenging to control [Reference Rio del Chanona, Reinforcement learning for batch bioprocess optimization]. System-wide or plant model dynamics cannot meaningfully be obtained for such processes and as such they must be treated as black-box models. Often there are multiple controlled variables such as pH, feed stock concentration, product concentration, temperature, pressure and flow rate; many of these parameters are dependant on each other and as such a control system which can allow communication between multiple controllers which correct related system states is important. \\
 As such we have developed an artificial neural network (ANN) for multiple controllers which are linked to each other by a surrogate model function - in this case $\phi_{approx}$. This surrogate model will allow the controllers to communicate and compromise on the optimisation of the tuning parameters to reach system stability. The tuning parameters make up the weights of each distinct error term in the input layer, allowing the controllers to generate control functions as the output. With that in mind we tested the extended model on two controllers and applied it to both linear and non-linear systems,
 \begin{align}
@@ -130,13 +118,14 @@ As such we have developed an artificial neural network (ANN) for multiple contro
 
 Figure X shows both system dynamics were brought to stability using the optimised tuning parameters. The history of how the model reached the optimal system response is shown. Upon addition of disturbance to the environment and noise to the controllers we optimised the tuning parameters and achieved stability for both the linear and non-linear system as is shown in part b) of Figure X. This model can be tested for $n$ number of controllers and the optimisation algorithm will coordinate the controllers since the optimiser adjusts the weights of the proportional, integral and derivative term for all controllers simultaneously. This makes the surrogate function a communication pathway to reach a globally optimal solution while exerting control on all system variables.
 
+%-------------LIMITATIONS AND COMPLEXITIES---------------------
 \subsection{Limitations \& Complexities}
 \subsubsection{Stochasticity}
 When developing this blackbox optimisation model we added disturbance and noise to the system environment and control system itself, respectively. This was done to test the robustness of the algorithm to sudden and small changes and simulate a stochastic version of the model. A non-robust controller would explode the derivative term in response to the uneven characteristics of the system response if the tuning parameters are not optimised correctly. Interestingly, we saw that the model was able to bring linear and non-linear systems to stability but at the costs of removing the derivative term entirely. This may be because the derivative term, while reducing the initial overshoot of the system, would become too sensitive to disturbance and noise from the environment and controller, respectively. We used a frozen Gaussian probability density function (one where the mean and standard deviation is fixed for each random variable generated) to add the complexity of disturbance and noise as given by,
 \begin{equation}
-    p(x) = \frac{1}{\sqrt{2\pi \sigma^2}} \exp{-\frac{(x-\mu)^2}{2\sigma^2}}
+    p(x) = \frac{1}{\sqrt{2\pi \sigma^2}} \exp{\left\{-\frac{ (x-\mu)^2}{2\sigma^2} \right\}}
 \end{equation}
-
+\vspace{1mm}
 \noindent Where $\mu$ is the mean and $\sigma$ is the standard deviation. A mean of $\mu = 0$ and standard deviation of $\sigma = 0.2$ were used. 
 
 \subsubsection{Hyperparameter Optimisation}
@@ -146,20 +135,35 @@ Currently, we are using a linear activation function in the PID controller i.e. 
     s(x) &= \frac{1}{1 + e^{-x}} \\
     f(x) &= \tanh(x) = \frac{1}{1+e^{-2x}}.
     \end{align}
-\vspace{3mm}
-
 \section{Outlook \& Further Work}
 \subsubsection{Non-linear Activation Function}
 As previously alluded to, it would be important to ascertain the model's behaviour with a non-linear activation function; this would be in pursuit of creating a better fit between the system dynamics and the approximate surrogate function globally across the entire sample domain.
-\vspace{2mm}
+\vspace{3mm}
 \subsubsection{Step Change Input}
 It would be most curious to train the neural net on a set of different disturbances and step input changes so that the model is able to handle large changes in the environment more effectively. This would involve prediction of optimal tuning parameters for specific step changes. 
-\vspace{2mm}
+\vspace{3mm}
 \subsubsection{Gaussian Processes}
 In this paper we have explored the use of a convex quadratic function to approximate the system dynamics. However, studies have shown that using Gaussian processes in place of a quadratic function can yield better results for global optimisation problems [Osborne, M. A., Garnett, R., \& Roberts, S. J. (2009). Gaussian processes for global optimisation]. Gaussien Processes are a generalisation of the Gaussian probability distribution. While probability distributions can describe random variables, Gaussian processes (which are stochastic bu definition) describe properties of functions over a finite space [Rasmussen Book]. One of the reasons why Gaussian processes may be a better fit for this than a quadratic function might be because the presence of significant stochastic uncertainties in a system environment can lead to closed-loop performance and uncontrollability issues. GPs can be used to formulate nonlinear constraints for non-linear systems and thus improve control performance [Bradford, 2018  Stochastic Nonlinear Model Predictive Control Using Gaussian Processes]
-\vspace{2mm}
+\vspace{3mm}
 \subsubsection{Reinforcement Learning - Q-learning}
-    
+Reinforcement learning (RL) is a particular branch of dynamic programming which has previously been applied to control systems by completely replacing PID controllers [6]. Ramanathan et. al. used Q-learning to control the fluid level in a non-linear conical tank and observed good performance [7]. A problem with replacing PID controllers with RL algorithms is that these algorithms heavily rely on the state space representation of the problem; that is, the architecture of the input, output and the system's dynamical equations. 
+Research has emerged where RL/PID control hybrid algorithms have been proposed using techniques such as Discrete Action Reinforcement Learning Automata [13] to tune PID control parameters with a higher learning rate than RL algorithms alone. Actor-critic methods have also been proposed to optimally tune controllers [18] for wind turbines: the actor maps states to the PID tuning parameters and the critic evaluates the output of the actor[THE paper, and 14]. \\
+Quality learning (Q-learning) is being used in tuning single PID controllers [19] and recently experiments have shown they can be applied to multiple controllers [THE Paper]. Q-learning incorporates the importance of an agent's ability to both explore and exploit the environment's resources. Q-learning leverages the dynamic nature of policy rewards such that the process of controlling a system becomes dynamic; instead of having a static set of gains for a PID control systems in an attempt to control a dynamic environment, Q-learning changes the weights of tuning parameters dynamically to suit the particular disturbances sensed from the environment. This means a PID controller can directly control a system which is simple while allowing the Q-learning algorithm to dynamically adjust the control function to adapt to more complex and non-linear systems and situations. \\
+With this in mind, we created a simplistic Q-learning architecture schema for the control of a single PID controller as seen in Figure [X]. This kind of approach can be taken for further investigation of Q-learning Rl/PID hybrid control algorithms for systems such as bioprocess systems.
+
+%---------------------CONCLUSION-----------------------------
+\section{Conclusion}
+
+%--------------------Acknowledgements------------------------
+\section{Acknowledgements}
+We would like to extend the warmest thanks to our research supervisors Professor Antonio Del Rio Chanona, Dr. Panos Petsagkourakis, and Ilya Orson Sandoval for their continued technical support and mentorship throughout the project. 
+
+
+
+
+
+
+
 
 
 
