@@ -170,8 +170,14 @@ Where,
 \noindent The reason we set up the algorithm to iterate in this way is due to the fact that each dynamic simulation for each unique value of $\mathbf{k}$ is computationally demanding and therefore, we want to minimise the required number of simulations to get to the optimum $\mathbf{k}^*$. In order to minimise the number of dynamic simulations we have the number of points on each axis, as specified earlier, as 10. This gives enough information to fit the approximate function to $\phi$ with a reasonable degree of accuracy. However, the accuracy of the fit is not high enough for us to conclude that the optimum $\mathbf{k}^* \approx \mathbf{k}_{approx}^*$ on the first iteration. Therefore, we must iteratively reduce the bounds, for the same number of points on each axis. This ensures as the number of iterations increases the resolution also increases eventually allowing us to approximate $\mathbf{k}^* \approx k_{approx}^*$ for a high enough number of iterations.
 
 \subsection{Coupled Controllers with Multiple Inputs and Multiple Outputs}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.45\textwidth]{NN.png}
+    \caption{Artificial Neural Network}
+    \label{fig:my_label}
+\end{figure}
 \noindent In a real process system, there will likely be cases where two or more controllers will be coupled. This means that it may be that the controllers act antagonistically and when the tuning parameters for one controller are optimised the other controllers may not be able to operate optimally. This is the problem of multiple input multiple output (MIMO) controller optimisation.
-
+%--------------------- MATHEMATICAL AND COMPUTATIONAL ASPECTS ------------------
 \section{Mathematical \& Computational Aspects}
 \noindent We are addressing the problem of tuning parameter optimisation using a surrogate machine learning model. We are using a quadratic approximation to the actual dynamics of the system. For this problem to be soluble the surrogate model has to be convex and all the constraints must also be convex such that the problem overall is convex. \\
 \theoremstyle{definition}
@@ -232,8 +238,6 @@ is convex if and only if $Q \succcurlyeq 0$. This is important because it means 
     \label{mimo_rough}
 \end{figure*}
 
-
-
 When optimising a control system we first had to segment the problem. The majority of dynamic systems are controllable using a P and I control system [Reference]. With this in mind, we pose the hypothesis: the algorithm should come to the conclusion that the majority of systems tested are PI-controllable. Indeed what we observed was that both linear and non-linear system dynamics were controllable and converged onto a set point; a number of set points were used to test model robustness and in each case the model presented a converging system response. We can see Figure X shows system responses for the optimal set of tuning parameters, $k_p$ and $k_i$  as determined by the surrogate model optimisation. Several iterations of the model were plotted on the same axis to show how the algorithm parses through the mesh of tuning parameters generated. The darker lines represent later iterations and the latest updates to the optimal response. The following were used as benchmark dynamic systems to test the model performance:
 \begin{equation}
 \dot{x} = 2x +u \quad \textrm{and} \quad \dot{x} = x^2 + u
@@ -258,12 +262,6 @@ As such we have developed an artificial neural network (ANN) for multiple contro
 
 \noindent Figure X shows both system dynamics were brought to stability using the optimised tuning parameters. The history of how the model reached the optimal system response is shown. Upon addition of disturbance to the environment and noise to the controllers we optimised the tuning parameters and achieved stability for both the linear and non-linear system as is shown in part b) of Figure X. This model can be tested for $n$ number of controllers and the optimisation algorithm will coordinate the controllers since the optimiser adjusts the weights of the proportional, integral and derivative term for all controllers simultaneously. This makes the surrogate function a communication pathway to reach a globally optimal solution while exerting control on all system variables.
 
-\begin{figure}
-    \centering
-    \includegraphics[width=0.45\textwidth]{NN.png}
-    \caption{Artificial Neural Network}
-    \label{fig:my_label}
-\end{figure}
 
 %----------------------------LIMITATIONS AND COMPLEXITIES------------------------
 \subsection{Limitations \& Complexities}
@@ -282,31 +280,23 @@ Currently, we are using a linear activation function in the PID controller i.e. 
 \begin{align}
     s(x) &= \frac{1}{1 + e^{-x}} \\
     f(x) &= \tanh(x) = \frac{1}{1+e^{-2x}}.
-    \end{align}
+\end{align}
+%-------------------OUTLOOK AND FURTHER WORK------------------------------  
 \section{Outlook \& Further Work}
 \subsubsection{Non-linear Activation Function}
-\noindent As previously alluded to, it would be important to ascertain the model's behaviour with a non-linear activation function; this would be in pursuit of creating a better fit between the system dynamics and the approximate surrogate function globally across the entire sample domain.
+As previously alluded to, it would be important to ascertain the model's behaviour with a non-linear activation function; this would be in pursuit of creating a better fit between the system dynamics and the approximate surrogate function globally across the entire sample domain.
 \subsubsection{Step Change Input}
-\noindent It would be most curious to train the neural net on a set of different disturbances and step input changes so that the model is able to handle large changes in the environment more effectively. This would involve prediction of optimal tuning parameters for specific step changes. 
+It would be most curious to train the neural net on a set of different disturbances and step input changes so that the model is able to handle large changes in the environment more effectively. This would involve prediction of optimal tuning parameters for specific step changes. 
 \subsubsection{Gaussian Processes}
-\noindent In this paper we have explored the use of a convex quadratic function to approximate the system dynamics. However, studies have shown that using Gaussian processes in place of a quadratic function can yield better results for global optimisation problems [Osborne, M. A., Garnett, R., \& Roberts, S. J. (2009). Gaussian processes for global optimisation]. Gaussien Processes are a generalisation of the Gaussian probability distribution. While probability distributions can describe random variables, Gaussian processes (which are stochastic bu definition) describe properties of functions over a finite space [Rasmussen Book]. One of the reasons why Gaussian processes may be a better fit for this than a quadratic function might be because the presence of significant stochastic uncertainties in a system environment can lead to closed-loop performance and uncontrollability issues. GPs can be used to formulate nonlinear constraints for non-linear systems and thus improve control performance [Bradford, 2018  Stochastic Nonlinear Model Predictive Control Using Gaussian Processes]
+In this paper we have explored the use of a convex quadratic function to approximate the system dynamics. However, studies have shown that using Gaussian processes in place of a quadratic function can yield better results for global optimisation problems [Osborne, M. A., Garnett, R., \& Roberts, S. J. (2009). Gaussian processes for global optimisation]. Gaussien Processes are a generalisation of the Gaussian probability distribution. While probability distributions can describe random variables, Gaussian processes (which are stochastic bu definition) describe properties of functions over a finite space [Rasmussen Book]. One of the reasons why Gaussian processes may be a better fit for this than a quadratic function might be because the presence of significant stochastic uncertainties in a system environment can lead to closed-loop performance and uncontrollability issues. GPs can be used to formulate nonlinear constraints for non-linear systems and thus improve control performance [Bradford, 2018  Stochastic Nonlinear Model Predictive Control Using Gaussian Processes]
 \subsubsection{Reinforcement Learning - Q-learning}
-\noindent Reinforcement learning (RL) is a particular branch of dynamic programming which has previously been applied to control systems by completely replacing PID controllers [6]. Ramanathan et. al. used Q-learning to control the fluid level in a non-linear conical tank and observed good performance [7]. A problem with replacing PID controllers with RL algorithms is that these algorithms heavily rely on the state space representation of the problem; that is, the architecture of the input, output and the system's dynamical equations. 
-Research has emerged where RL/PID control hybrid algorithms have been proposed using techniques such as Discrete Action Reinforcement Learning Automata [13] to tune PID control parameters with a higher learning rate than RL algorithms alone. Actor-critic methods have also been proposed to optimally tune controllers [18] for wind turbines: the actor maps states to the PID tuning parameters and the critic evaluates the output of the actor[THE paper, and 14]. Quality learning (Q-learning) is being used in tuning single PID controllers [19] and recently experiments have shown they can be applied to multiple controllers [THE Paper]. Q-learning incorporates the importance of an agent's ability to both explore and exploit the environment's resources. Q-learning leverages the dynamic nature of policy rewards such that the process of controlling a system becomes dynamic; instead of having a static set of gains for a PID control systems in an attempt to control a dynamic environment, Q-learning changes the weights of tuning parameters dynamically to suit the particular disturbances sensed from the environment. This means a PID controller can directly control a system which is simple while allowing the Q-learning algorithm to dynamically adjust the control function to adapt to more complex and non-linear systems and situations. With this in mind, we created a simplistic Q-learning architecture schema for the control of a single PID controller as seen in Figure [X]. This kind of approach can be taken for further investigation of Q-learning RL/PID hybrid control algorithms for systems such as bioprocess systems.
-\begin{figure}[h!]
+\begin{figure}
     \center{\includegraphics[width=0.499\textwidth]{7.png}}
-    \caption{Adaptive PID controller q-learning architecture proposed for future work on this project}
+    \caption{Adaptive PID controller Q-learning architecture proposed for future work on this project}
     \label{q-learning}
 \end{figure}
-
-
-
-
-
-
-
-
-
+Reinforcement learning (RL) is a particular branch of dynamic programming which has previously been applied to control systems by completely replacing PID controllers [6]. Ramanathan et. al. used Q-learning to control the fluid level in a non-linear conical tank and observed good performance [7]. A problem with replacing PID controllers with RL algorithms is that these algorithms heavily rely on the state space representation of the problem; that is, the architecture of the input, output and the system's dynamical equations. 
+Research has emerged where RL/PID control hybrid algorithms have been proposed using techniques such as Discrete Action Reinforcement Learning Automata [13] to tune PID control parameters with a higher learning rate than RL algorithms alone. Actor-critic methods have also been proposed to optimally tune controllers [18] for wind turbines: the actor maps states to the PID tuning parameters and the critic evaluates the output of the actor[THE paper, and 14]. Quality learning (Q-learning) is being used in tuning single PID controllers [19] and recently experiments have shown they can be applied to multiple controllers [THE Paper]. Q-learning incorporates the importance of an agent's ability to both explore and exploit the environment's resources. Q-learning leverages the dynamic nature of policy rewards such that the process of controlling a system becomes dynamic; instead of having a static set of gains for a PID control systems in an attempt to control a dynamic environment, Q-learning changes the weights of tuning parameters dynamically to suit the particular disturbances sensed from the environment. This means a PID controller can directly control a system which is simple while allowing the Q-learning algorithm to dynamically adjust the control function to adapt to more complex and non-linear systems and situations. With this in mind, we created a simplistic Q-learning architecture schema for the control of a single PID controller as seen in Figure [X]. This kind of approach can be taken for further investigation of Q-learning RL/PID hybrid control algorithms for systems such as bioprocess systems.
 
 %---------------------CONCLUSION-----------------------------
 
@@ -317,8 +307,7 @@ To be successful it was also important for the algorithm to be able to determine
 
 Perhaps the most important conclusion of this research is that the algorithm was successful in its primary objective which was to provide an automated and systematic way of tuning the control parameters for a black-box system. This is a particularly striking result as it demonstrates that with access to data about system responses and with no further knowledge of the actual system dynamics, it is possible to effectively find its optimum tuning parameters. This removes the need for any manual intervention using tuning methods, which in turn means that system operators need not be trained extensively in the methods by which control systems are tuned. It also means that any inefficiencies that arise from these tuning methods can be disregarded which would be beneficial in the operation of process systems due to more capable responses to disturbances and step changes that would be produced by the PID controllers. 
 
-
-%--------------------Acknowledgements------------------------
+%--------------------ACKNOWLEDGEMENTS------------------------
 \section{Acknowledgements}
 \noindent We would like to extend the warmest thanks to our research supervisors Professor Antonio Del Rio Chanona, Dr. Panos Petsagkourakis, and Ilya Orson Sandoval for their continued technical support and mentorship throughout the project. 
 
