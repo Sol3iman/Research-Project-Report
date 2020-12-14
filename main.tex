@@ -62,7 +62,7 @@
 
 \usepackage{lipsum}
 
-\setlength{\parskip}{0.1\baselineskip plus 0.1pt}
+% \setlength{\parskip}{0.1\baselineskip plus 0.1pt}
 
 \begin{document}
 
@@ -79,9 +79,11 @@
 }
 
 % make the title area
-% \thispagestyle{plain}
-% \pagestyle{plain}
+% For the numbering - somehow page one does not number. Have a look at the SoD project for this. 
+
+\pagestyle{plain}
 \maketitle
+\thispagestyle{plain}
 
 \begin{abstract}
 Process control is an integral part of process systems anywhere in large scale production processes to applications in robotic devices. Specifically, we are interested in systematic control of bioprocesses due to their presence in sustainable generation of fossil-fuel alternatives. These systems are highly non-linear and display stochastic behaviour not easily modelled, creating a disparity in the plant-wide dynamics and model dynamics [Rio Del Chanona]. In this paper we investigate a black-box optimisation method through the use of a surrogate model to approximate the system dynamics and tune PID controller parameters through an gradient descent optimisation algorithm. We show that PID tuning parameters can be optimised for linear and non-linear systems without he intervention of manual methodologies such as Ziegler-Nichols or Cohen-Coon. We extended this model to multiple controllers whereby the surrogate model allowed communication between the the PID controller nodes in the artificial neural network. This multiple input and multiple output (MIMO) model is able to optimise PID controls for two different states of a system to various set point values for linear and non-linear systems so they reach stability given controllable system dynamics. \\
@@ -193,6 +195,44 @@ is convex if and only if $Q \succcurlyeq 0$. This is important because it means 
 %--------------------------RESULTS AND DISCUSSION------------------------------------
 \section{Results \& Discussion}
 \subsection{Optimisation of a 2D Control System}
+\begin{figure*}[h]
+    \setlength{\abovecaptionskip}{0pt}
+    \center{\includegraphics[width=\textwidth]{1.png}}
+    \caption{The system responses shown are for the 2D case where we optimised only the tuning parameters $k_p$ and $k_i$. The above two graphs show the system response history for each iteration that the algorithm runs for a linear (blue) and a non-linear (green) system, respectively. The system was run 40 iterations and samples at every \nth{10} iteration. We observe system stability being reached for each experiment.}
+    \label{kpki}
+\end{figure*}
+
+\begin{figure*}[h]
+    \center{\includegraphics[width=\textwidth]{2.png}}
+    \caption{The above figure shows log contour plots of the approximate function $\phi_{approx}$ for 3 different scenarios from left to right: a) system convergence, b) system divergence and c) oscillatory system response with convergence. Regions where the surrogate function estimates a minimum we see greater curvature and these regions are highlighted with a red circle and a corresponding annotation about the value of the tuning parameters. The experiments were conducted over linear system dynamics.}
+    \label{kpki_contour}
+\end{figure*}
+
+\begin{figure*}[h]
+    \center{\includegraphics[width=\textwidth]{3.png}}
+    \caption{The system responses shown are for the 3D case where we optimised the tuning parameters $k_p$, $k_i$ and $k_d$. The above two graphs show the system response history for each iteration that the algorithm runs for a linear (blue) and a non-linear (green) system, respectively. The system was run 40 iterations and samples at every \nth{10} iteration. We observe system stability being reached for each experiment.}
+    \label{kpkikd}
+\end{figure*}
+
+\begin{figure*}[h]
+    \center{\includegraphics[width=\textwidth]{8.png}}
+    \caption{\lipsum[2]}
+    \label{3D_plots}
+\end{figure*}
+
+\begin{figure*}[h]
+    \center{\includegraphics[width=\textwidth]{5.png}}
+    \caption{\lipsum[2]}
+    \label{mimo_smooth}
+\end{figure*}
+
+\begin{figure*}[h]
+    \center{\includegraphics[width=\textwidth]{6.png}}
+    \caption{\lipsum[2]}
+    \label{mimo_rough}
+\end{figure*}
+
+
 
 When optimising a control system we first had to segment the problem. The majority of dynamic systems are controllable using a P and I control system [Reference]. With this in mind, we pose the hypothesis: the algorithm should come to the conclusion that the majority of systems tested are PI-controllable. Indeed what we observed was that both linear and non-linear system dynamics were controllable and converged onto a set point; a number of set points were used to test model robustness and in each case the model presented a converging system response. We can see Figure X shows system responses for the optimal set of tuning parameters, $k_p$ and $k_i$  as determined by the surrogate model optimisation. Several iterations of the model were plotted on the same axis to show how the algorithm parses through the mesh of tuning parameters generated. The darker lines represent later iterations and the latest updates to the optimal response. The following were used as benchmark dynamic systems to test the model performance:
 \begin{equation}
@@ -202,7 +242,7 @@ It is important to note the algorithm is designed to work on unknown system dyna
 The cost function $\phi$ is evaluated at each iteration and plotted over the parameter vector space to visualise the surface. We do this in a 3-dimensional plot of $k_p$ against $k_i$ and $\phi$. The value of $\phi$ is broken into percentiles and categorised in the plot using a continuous colour scale. It can be seen the cost function $\phi$ predicts the optimal value of $\boldsymbol \pi$ to be in the region with low $k_i$ and high $k_p$ values. The sample space in the parameter mesh is cubic and this is seen in the plot. The surrogate function $\phi_{approx}$ predicts the optimal $\boldsymbol \pi$ to be at $(5,5)$. This is not completely consistent with what the cost function predicts. This may be because the surrogate model is sampled far more around that point and as such a greater weight is given for that set of values as the optimum $\boldsymbol \pi$. A higher density plot of phi was generated to test this and indeed the optimum predicted by the surrogate function moved closer to the darker red region where $\phi$ is minimised [figure reference].
 Furthermore, while low values of the integral term are preferred - which controls how smooth the system response is - a zero value for $k_i$ is not. Without any integral action the system response starts oscillating and often results in a steady state error. We therefore suggest that a PI-control system is sufficient for most linear and non-linear systems with first order dynamics. 
 
-\subsection{$\phi_{approx}$ vs. $\phi$ Fit }
+\subsection{$\phi_{approx}$ vs. $\phi$ fit }
 We investigated the agreement between the surrogate function $\phi_{approx}$ and the cost function $\phi$ in Figure X. Comparing the contours to the 3-dimensional scatter plot for $\phi$ in Figure X shows us that there is a large flat region before the surface shows curvature. This is seen in the contour plots. More specifically, there are three cases which were isolated for analysis: a) system convergence, b) divergence and c) fast oscillatory system response. In case a) we can see that the contour starts curving to a minimum which is in a region with a high $k_p$ and low (and non-zero) $k_i$ value. This is consistent with the predictions from the cost function alone. We can see the system reaches a steady state set point value preset at 15 for this experiment. Case b) presents a case where the contour is approaching a point which is in a region with low $k_p$ and high $k_i$. It is clear that when the proportional gain is not large enough the system is not only slow to respond (large rise time) it is also unable to reach a steady state value and therefore stability. The final case is the last iteration of the experiment and shows that a possible system response is one with both $k_p$ and $k_i$ at the boundary of the active constraints set; here we observe large initial overshoot and initial oscillations which are brought about by the larger integral term. 
 
 \subsection{Optimisation of a 3D Control System}
@@ -218,6 +258,13 @@ As such we have developed an artificial neural network (ANN) for multiple contro
 
 \noindent Figure X shows both system dynamics were brought to stability using the optimised tuning parameters. The history of how the model reached the optimal system response is shown. Upon addition of disturbance to the environment and noise to the controllers we optimised the tuning parameters and achieved stability for both the linear and non-linear system as is shown in part b) of Figure X. This model can be tested for $n$ number of controllers and the optimisation algorithm will coordinate the controllers since the optimiser adjusts the weights of the proportional, integral and derivative term for all controllers simultaneously. This makes the surrogate function a communication pathway to reach a globally optimal solution while exerting control on all system variables.
 
+\begin{figure}
+    \centering
+    \includegraphics[width=0.45\textwidth]{NN.png}
+    \caption{Artificial Neural Network}
+    \label{fig:my_label}
+\end{figure}
+
 %----------------------------LIMITATIONS AND COMPLEXITIES------------------------
 \subsection{Limitations \& Complexities}
 \subsubsection{Stochasticity}
@@ -226,13 +273,12 @@ As such we have developed an artificial neural network (ANN) for multiple contro
     p(x) = \frac{1}{\sqrt{2\pi \sigma^2}} \exp{\left\{-\frac{ (x-\mu)^2}{2\sigma^2} \right\}}
 \end{equation}
 \vspace{1mm}
-\noindent Where $\mu$ is the mean and $\sigma$ is the standard deviation. A mean of $\mu = 0$ and standard deviation of $\sigma = 0.2$ were used. 
+\noindent Where $\mu$ is the mean and $\sigma$ is the standard deviation. A mean of $\mu=0$ and standard deviation of $\sigma=0.2$ were used. 
 
-\vspace{2mm}
 \subsubsection{Hyperparameter Optimisation}
-\noindent There were several hyperparameters which we did not yet optimise for in this model. These include the number of iterations the neural network needs to run to each an optimum value, the size of the network itself, and the activation function for the optimisation. Blackbox optimisation problems rapidly become computationally expensive. This is apparent when looking at the architecture of the ANN for the MIMO system. Each controller commands a set of six coefficients and three tuning parameters in the surrogate function and with a sample space as small as two samples per tuning parameter the space grows exponentially by $(2n)^i$ where $n$ is the number of nodes and $i$ represents the dimensionality of the vector space, 3, in this case. As such we only tested the MIMO system using two controllers as we were running all simulations on a 2014 \SI{2.2}{GHz} Quad-Core i7 processor chip. \\
+There were several hyperparameters which we did not yet optimise for in this model. These include the number of iterations the neural network needs to run to each an optimum value, the size of the network itself, and the activation function for the optimisation. Blackbox optimisation problems rapidly become computationally expensive. This is apparent when looking at the architecture of the ANN for the MIMO system. Each controller commands a set of six coefficients and three tuning parameters in the surrogate function and with a sample space as small as two samples per tuning parameter the space grows exponentially by $(2n)^i$ where $n$ is the number of nodes and $i$ represents the dimensionality of the vector space, 3, in this case. As such we only tested the MIMO system using two controllers as we were running all simulations on a 2014 \SI{2.2}{GHz} Quad-Core i7 processor chip. 
 
-\noindent Currently, we are using a linear activation function in the PID controller i.e. the $u$ function. This means that the current neural network cannot stack several layers because irrespective of the number of layers in the neural network the activation of the output layer is simply going to be a linear combination of the input of the first layer. This can be overcome by replacing the linear activation function with a non-linear function such as a Sigmoid function or a hyperbolic tangent function like below, 
+Currently, we are using a linear activation function in the PID controller i.e. the $u$ function. This means that the current neural network cannot stack several layers because irrespective of the number of layers in the neural network the activation of the output layer is simply going to be a linear combination of the input of the first layer. This can be overcome by replacing the linear activation function with a non-linear function such as a Sigmoid function or a hyperbolic tangent function like below, 
 \begin{align}
     s(x) &= \frac{1}{1 + e^{-x}} \\
     f(x) &= \tanh(x) = \frac{1}{1+e^{-2x}}.
@@ -240,78 +286,36 @@ As such we have developed an artificial neural network (ANN) for multiple contro
 \section{Outlook \& Further Work}
 \subsubsection{Non-linear Activation Function}
 \noindent As previously alluded to, it would be important to ascertain the model's behaviour with a non-linear activation function; this would be in pursuit of creating a better fit between the system dynamics and the approximate surrogate function globally across the entire sample domain.
-\vspace{3mm}
 \subsubsection{Step Change Input}
 \noindent It would be most curious to train the neural net on a set of different disturbances and step input changes so that the model is able to handle large changes in the environment more effectively. This would involve prediction of optimal tuning parameters for specific step changes. 
-\vspace{3mm}
 \subsubsection{Gaussian Processes}
 \noindent In this paper we have explored the use of a convex quadratic function to approximate the system dynamics. However, studies have shown that using Gaussian processes in place of a quadratic function can yield better results for global optimisation problems [Osborne, M. A., Garnett, R., \& Roberts, S. J. (2009). Gaussian processes for global optimisation]. Gaussien Processes are a generalisation of the Gaussian probability distribution. While probability distributions can describe random variables, Gaussian processes (which are stochastic bu definition) describe properties of functions over a finite space [Rasmussen Book]. One of the reasons why Gaussian processes may be a better fit for this than a quadratic function might be because the presence of significant stochastic uncertainties in a system environment can lead to closed-loop performance and uncontrollability issues. GPs can be used to formulate nonlinear constraints for non-linear systems and thus improve control performance [Bradford, 2018  Stochastic Nonlinear Model Predictive Control Using Gaussian Processes]
-\vspace{3mm}
 \subsubsection{Reinforcement Learning - Q-learning}
 \noindent Reinforcement learning (RL) is a particular branch of dynamic programming which has previously been applied to control systems by completely replacing PID controllers [6]. Ramanathan et. al. used Q-learning to control the fluid level in a non-linear conical tank and observed good performance [7]. A problem with replacing PID controllers with RL algorithms is that these algorithms heavily rely on the state space representation of the problem; that is, the architecture of the input, output and the system's dynamical equations. 
-Research has emerged where RL/PID control hybrid algorithms have been proposed using techniques such as Discrete Action Reinforcement Learning Automata [13] to tune PID control parameters with a higher learning rate than RL algorithms alone. Actor-critic methods have also been proposed to optimally tune controllers [18] for wind turbines: the actor maps states to the PID tuning parameters and the critic evaluates the output of the actor[THE paper, and 14]. \\
-
-\noindent Quality learning (Q-learning) is being used in tuning single PID controllers [19] and recently experiments have shown they can be applied to multiple controllers [THE Paper]. Q-learning incorporates the importance of an agent's ability to both explore and exploit the environment's resources. Q-learning leverages the dynamic nature of policy rewards such that the process of controlling a system becomes dynamic; instead of having a static set of gains for a PID control systems in an attempt to control a dynamic environment, Q-learning changes the weights of tuning parameters dynamically to suit the particular disturbances sensed from the environment. This means a PID controller can directly control a system which is simple while allowing the Q-learning algorithm to dynamically adjust the control function to adapt to more complex and non-linear systems and situations. \\
-
-\noindent With this in mind, we created a simplistic Q-learning architecture schema for the control of a single PID controller as seen in Figure [X]. This kind of approach can be taken for further investigation of Q-learning RL/PID hybrid control algorithms for systems such as bioprocess systems.
-\begin{figure}[h]
+Research has emerged where RL/PID control hybrid algorithms have been proposed using techniques such as Discrete Action Reinforcement Learning Automata [13] to tune PID control parameters with a higher learning rate than RL algorithms alone. Actor-critic methods have also been proposed to optimally tune controllers [18] for wind turbines: the actor maps states to the PID tuning parameters and the critic evaluates the output of the actor[THE paper, and 14]. Quality learning (Q-learning) is being used in tuning single PID controllers [19] and recently experiments have shown they can be applied to multiple controllers [THE Paper]. Q-learning incorporates the importance of an agent's ability to both explore and exploit the environment's resources. Q-learning leverages the dynamic nature of policy rewards such that the process of controlling a system becomes dynamic; instead of having a static set of gains for a PID control systems in an attempt to control a dynamic environment, Q-learning changes the weights of tuning parameters dynamically to suit the particular disturbances sensed from the environment. This means a PID controller can directly control a system which is simple while allowing the Q-learning algorithm to dynamically adjust the control function to adapt to more complex and non-linear systems and situations. With this in mind, we created a simplistic Q-learning architecture schema for the control of a single PID controller as seen in Figure [X]. This kind of approach can be taken for further investigation of Q-learning RL/PID hybrid control algorithms for systems such as bioprocess systems.
+\begin{figure}[h!]
     \center{\includegraphics[width=0.499\textwidth]{7.png}}
-    \caption{\lipsum[2]}
+    \caption{Adaptive PID controller q-learning architecture proposed for future work on this project}
     \label{q-learning}
 \end{figure}
 
-\onecolumn 
-\begin{figure}[h]
-    \setlength{\abovecaptionskip}{0pt}
-    \center{\includegraphics[width=\textwidth]{1.png}}
-    \caption{The system responses shown are for the 2D case where we optimised only the tuning parameters $k_p$ and $k_i$. The above two graphs show the system response history for each iteration that the algorithm runs for a linear (blue) and a non-linear (green) system, respectively. The system was run 40 iterations and samples at every \nth{10} iteration. We observe system stability being reached for each experiment.}
-    \label{kpki}
-\end{figure}
-\vspace{-5mm}
-\begin{figure}[h]
-    \center{\includegraphics[width=\textwidth]{2.png}}
-    \caption{The above figure shows log contour plots of the approximate function $\phi_{approx}$ for 3 different scenarios from left to right: a) system convergence, b) system divergence and c) oscillatory system response with convergence. Regions where the surrogate function estimates a minimum we see greater curvature and these regions are highlighted with a red circle and a corresponding annotation about the value of the tuning parameters. The experiments were conducted over linear system dynamics.}
-    \label{kpki_contour}
-\end{figure}
-\vspace{-5mm}
-\begin{figure}[h]
-    \center{\includegraphics[width=\textwidth]{3.png}}
-    \caption{The system responses shown are for the 3D case where we optimised the tuning parameters $k_p$, $k_i$ and $k_d$. The above two graphs show the system response history for each iteration that the algorithm runs for a linear (blue) and a non-linear (green) system, respectively. The system was run 40 iterations and samples at every \nth{10} iteration. We observe system stability being reached for each experiment.}
-    \label{kpkikd}
-\end{figure}
-\vspace{-5mm}
-\begin{figure}[h]
-    \center{\includegraphics[width=\textwidth]{5.png}}
-    \caption{\lipsum[2]}
-    \label{mimo_smooth}
-\end{figure}
-\vspace{-5mm}
-\begin{figure}[h]
-    \center{\includegraphics[width=\textwidth]{6.png}}
-    \caption{\lipsum[2]}
-    \label{mimo_rough}
-\end{figure}
-\vspace{-5mm}
-\begin{figure}[h]
-    \center{\includegraphics[width=\textwidth]{8.png}}
-    \caption{\lipsum[2]}
-    \label{3D_plots}
-\end{figure}
+
+
+
+
 
 
 
 
 
 %---------------------CONCLUSION-----------------------------
-\twocolumn
+
 \section{Conclusion}
 \noindent Having performed all of the simulations we are able to draw some conclusions about both the algorithm and the general field. We hypothesised that as PI control was generally sufficient for most cases in the process industry it would likely be sufficient to control many of the black-box systems trialled on the algorithm. We determined that this was indeed the case as when the algorithm was trialled for simple PI control it returned $k_p$ and $k_i$ values which allowed the system to respond well to the given step changes. 
 
-\noindent To be successful it was also important for the algorithm to be able to determine optimum tuning parameters for a wide range of different system types. As seen in the results and discussion the algorithm was able to predict the optimum tuning parameters for both linear and non-linear black-box systems. This reflects positively on the algorithms robustness. However, to be able to formally define our algorithm as robust it would be necessary for us the test the algorithm on a very wide range of system dynamics. This unfortunately was not feasible for us to achieve as our time to produce this research was very limited, but it is something that we would wish to consider in future work in this area.
+To be successful it was also important for the algorithm to be able to determine optimum tuning parameters for a wide range of different system types. As seen in the results and discussion the algorithm was able to predict the optimum tuning parameters for both linear and non-linear black-box systems. This reflects positively on the algorithms robustness. However, to be able to formally define our algorithm as robust it would be necessary for us the test the algorithm on a very wide range of system dynamics. This unfortunately was not feasible for us to achieve as our time to produce this research was very limited, but it is something that we would wish to consider in future work in this area. For the algorithm to be of any practical use it would have to be able to tune a number of linked controllers. In our testing the algorithm was able to tune two linked controllers. This functionality can be extended to any number of linked controllers. The constraining factor in our testing was the dimensionality of the problem with the increase in the number of controllers. The increase in the dimensionality of the problem simply made testing on any more than two linked controllers infeasible due to the increase in computation time. With access to HPC computers the algorithm would be able to effectively tune the parameters for any number of controllers. An interesting area for further research would be to look into methods of dimensionality reduction. 
 
-\noindent For the algorithm to be of any practical use it would have to be able to tune a number of linked controllers. In our testing the algorithm was able to tune two linked controllers. This functionality can be extended to any number of linked controllers. The constraining factor in our testing was the dimensionality of the problem with the increase in the number of controllers. The increase in the dimensionality of the problem simply made testing on any more than two linked controllers infeasible due to the increase in computation time. With access to HPC computers the algorithm would be able to effectively tune the parameters for any number of controllers. An interesting area for further research would be to look into methods of dimensionality reduction.
-
-\noindent Perhaps the most important conclusion of this research is that the algorithm was successful in its primary objective which was to provide an automated and systematic way of tuning the control parameters for a black-box system. This is a particularly striking result as it demonstrates that with access to data about system responses and with no further knowledge of the actual system dynamics, it is possible to effectively find its optimum tuning parameters. This removes the need for any manual intervention using tuning methods, which in turn means that system operators need not be trained extensively in the methods by which control systems are tuned. It also means that any inefficiencies that arise from these tuning methods can be disregarded which would be beneficial in the operation of process systems due to more capable responses to disturbances and step changes that would be produced by the PID controllers. 
+Perhaps the most important conclusion of this research is that the algorithm was successful in its primary objective which was to provide an automated and systematic way of tuning the control parameters for a black-box system. This is a particularly striking result as it demonstrates that with access to data about system responses and with no further knowledge of the actual system dynamics, it is possible to effectively find its optimum tuning parameters. This removes the need for any manual intervention using tuning methods, which in turn means that system operators need not be trained extensively in the methods by which control systems are tuned. It also means that any inefficiencies that arise from these tuning methods can be disregarded which would be beneficial in the operation of process systems due to more capable responses to disturbances and step changes that would be produced by the PID controllers. 
 
 
 %--------------------Acknowledgements------------------------
