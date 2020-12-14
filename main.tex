@@ -48,9 +48,9 @@
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}[section]
 \newcommand{\ts}{\textsuperscript}
-% \newcommand{\bol}{\boldsymbol}
 
-\renewcommand{\abstractname}{\center\large Abstract\\}
+
+\renewcommand{\abstractname}{\center\large Abstract \\}
 \let\oldabstract\abstract
 \renewcommand\abstract{%
   \begingroup
@@ -61,8 +61,8 @@
 }
 
 \usepackage{lipsum}
-
-% \setlength{\parskip}{0.1\baselineskip plus 0.1pt}
+\usepackage{microtype}
+\usepackage{lettrine}
 
 \begin{document}
 
@@ -79,28 +79,42 @@
 }
 
 % make the title area
-% For the numbering - somehow page one does not number. Have a look at the SoD project for this. 
+
+% \pagestyle{plain}
+% \maketitle
+% \thispagestyle{plain}
+
 
 \pagestyle{plain}
-\maketitle
+\twocolumn[
+    \begin{@twocolumnfalse}
+    \pagestyle{plain}
+    \maketitle
+    \thispagestyle{plain}
+    \end{@twocolumnfalse}
+    \begin{abstract}
+    ~{Process control is an integral part of process systems anywhere in large scale production processes to applications in robotic devices. Specifically, we are interested in systematic control of bioprocesses due to their presence in sustainable generation of fossil-fuel alternatives. These systems are highly non-linear and display stochastic behaviour not easily modelled, creating a disparity in the plant-wide dynamics and model dynamics [Rio Del Chanona]. In this paper we investigate a black-box optimisation method through the use of a surrogate model to approximate the system dynamics and tune PID controller parameters through an gradient descent optimisation algorithm. We show that PID tuning parameters can be optimised for linear and non-linear systems without he intervention of manual methodologies such as Ziegler-Nichols or Cohen-Coon. We extended this model to multiple controllers whereby the surrogate model allowed communication between the the PID controller nodes in the artificial neural network. This multiple input and multiple output (MIMO) model is able to optimise PID controls for two different states of a system to various set point values for linear and non-linear systems so they reach stability given controllable system dynamics. \\
+
+    \noindent \textit{Key words: Black-box, artificial neural network, process control, PID, tuning, control, Ziegler-Nichols, Cohen-Coon, surrogate model, deep reinforcement learning, Q-learning, MIMO, optimisation}}
+    \end{abstract}
+\bigskip]
 \thispagestyle{plain}
+% \begin{abstract}
+% Process control is an integral part of process systems anywhere in large scale production processes to applications in robotic devices. Specifically, we are interested in systematic control of bioprocesses due to their presence in sustainable generation of fossil-fuel alternatives. These systems are highly non-linear and display stochastic behaviour not easily modelled, creating a disparity in the plant-wide dynamics and model dynamics [Rio Del Chanona]. In this paper we investigate a black-box optimisation method through the use of a surrogate model to approximate the system dynamics and tune PID controller parameters through an gradient descent optimisation algorithm. We show that PID tuning parameters can be optimised for linear and non-linear systems without he intervention of manual methodologies such as Ziegler-Nichols or Cohen-Coon. We extended this model to multiple controllers whereby the surrogate model allowed communication between the the PID controller nodes in the artificial neural network. This multiple input and multiple output (MIMO) model is able to optimise PID controls for two different states of a system to various set point values for linear and non-linear systems so they reach stability given controllable system dynamics. \\
 
-\begin{abstract}
-Process control is an integral part of process systems anywhere in large scale production processes to applications in robotic devices. Specifically, we are interested in systematic control of bioprocesses due to their presence in sustainable generation of fossil-fuel alternatives. These systems are highly non-linear and display stochastic behaviour not easily modelled, creating a disparity in the plant-wide dynamics and model dynamics [Rio Del Chanona]. In this paper we investigate a black-box optimisation method through the use of a surrogate model to approximate the system dynamics and tune PID controller parameters through an gradient descent optimisation algorithm. We show that PID tuning parameters can be optimised for linear and non-linear systems without he intervention of manual methodologies such as Ziegler-Nichols or Cohen-Coon. We extended this model to multiple controllers whereby the surrogate model allowed communication between the the PID controller nodes in the artificial neural network. This multiple input and multiple output (MIMO) model is able to optimise PID controls for two different states of a system to various set point values for linear and non-linear systems so they reach stability given controllable system dynamics. \\
-
-\noindent \textit{Key words: Black-box, artificial neural network, process control, PID, tuning, control, Ziegler-Nichols, Cohen-Coon, surrogate model, deep reinforcement learning, Q-learning, MIMO, optimisation}\end{abstract}
+% \noindent \textit{Key words: Black-box, artificial neural network, process control, PID, tuning, control, Ziegler-Nichols, Cohen-Coon, surrogate model, deep reinforcement learning, Q-learning, MIMO, optimisation}
+% \end{abstract}
 
 \IEEEpeerreviewmaketitle
 
-
 \section{Introduction \& Motivation}
-\noindent The topic of research considered in this paper covers a wide range of disciplines including process control, optimal control, black-box optimisation (BBO) and machine learning. Process feedback control dates back all the way to the third century BC. During this period Ktesibios of Alexandria employed a float valve to regulate the level in the water clocks used at that time [1]. Over the course of the subsequent centuries there was some development in process control, but it wasn’t until the industrial revolution that process control became widely utilised. The digital revolution coupled with the work of Russian American scientist Nicolas Minorsky on a formal control law (today known as PID control) [2] allowed for the development of modern computational control technologies which are used almost universally today in all process systems. Optimal control theory attempts to find a control law for a dynamical system that enables the system to perfectly respond to changes and disturbances. Ensuring optimal control is not straightforward and historically a large amount of effort has gone into designing approaches to solve this problem. Many of the systems that arise in chemical engineering problems are non-linear in nature [3]. This poses a problem when considering the control of such systems, as we may not have an easily tractable analytical expression that describes their responses to variations in the operating conditions. In this paper we aimed to address this problem by producing an algorithm which can find the optimal PID parameters to control a black-box system which is, by definition, a priori unknown. 
+\lettrine{T}{he} topic of research considered in this paper covers a wide range of disciplines including process control, optimal control, black-box optimisation (BBO) and machine learning. Process feedback control dates back all the way to the third century BC. During this period Ktesibios of Alexandria employed a float valve to regulate the level in the water clocks used at that time [1]. Over the course of the subsequent centuries there was some development in process control, but it wasn’t until the industrial revolution that process control became widely utilised. The digital revolution coupled with the work of Russian American scientist Nicolas Minorsky on a formal control law (today known as PID control) [2] allowed for the development of modern computational control technologies which are used almost universally today in all process systems. Optimal control theory attempts to find a control law for a dynamical system that enables the system to perfectly respond to changes and disturbances. Ensuring optimal control is not straightforward and historically a large amount of effort has gone into designing approaches to solve this problem. Many of the systems that arise in chemical engineering problems are non-linear in nature [3]. This poses a problem when considering the control of such systems, as we may not have an easily tractable analytical expression that describes their responses to variations in the operating conditions. In this paper we aimed to address this problem by producing an algorithm which can find the optimal PID parameters to control a black-box system which is, by definition, a priori unknown. 
 
 \noindent Black-Box optimisation methods are used in machine learning to find the minimum value of a real valued function that has no readily available analytical form. There are a wide variety of different BBO methods available including Genetic algorithms [4] and Particle Swarm algorithms [5]. The problem that we attempt to solve in the research paper can be described in its simplest form as follows: How can the optimum parameters to tune a PID controller for a black-box process system be found in an automated and systematic way? 
 
 \noindent This is a vital problem to solve because an effectively tuned controller can provide a myriad of benefits in the operation of a process system. These benefits include but are not limited to ensuring product quality is maintained during operation by minimising the effects of process disturbances, establishing and maintaining process safety during operation and mitigating the time required, and the effects of, process start-up and shutdown. As the demands on the process industries grow over the coming years to serve an ever growing and increasingly affluent population, more energy and product wastage will occur in absolute terms. This highlights the importance of effective controller operation, and by extension controller tuning, as even small margins of unnecessary loss projected across time can lead to large unrealised profits for companies. Methods such as Ziegler-Nichols [6] and Cohen-Coon tuning [7] have been traditionally used to tune process controllers. Today these methods are  antiquated as they are time consuming and the controller parameters produced are generally not optimal. Currently in industry control engineers are increasingly turning to computational methods to optimise their control systems. Many of these methods rely on a knowledge of the physical system which for chemical engineering applications is generally unrealistic as the processes are highly complex in nature. Black-box optimisation methods can be exploited to provide a solution to this problem. In this research project we have considered a polynomial regression algorithm which approximates the true function by fitting a convex surrogate function. We can then apply a derivative based gradient descent to the surrogate function to determine the optimum point. To evaluate the effectiveness of this method requires us to consider the ease of implementation, the robustness of the method as well as how the dynamic system response is for the optimum tuning parameters.
 
-\noindent The objectives of this research are primarily to have a robust algorithm which can be applied to determine the optimal control parameters for a wide range of systems. To do this we will consider a description of the proposed algorithm which provides the solution, an evaluation of the solution and a discussion of the algorithm performance and finally considerations about potential future improvements.
+The objectives of this research are primarily to have a robust algorithm which can be applied to determine the optimal control parameters for a wide range of systems. To do this we will consider a description of the proposed algorithm which provides the solution, an evaluation of the solution and a discussion of the algorithm performance and finally considerations about potential future improvements.
 %--------------------METHODS------------------------
 \section{Methods}
 \noindent In this section of the report, we will set up and define explicitly, the exact form of the control system we used and how we set up the optimisation problem. We will then walk the reader through our algorithm which provides a solution to the problem for the single input single output case. Having arrived at a satisfactory solution for the preceding case we then consider the problem of multiple coupled controllers and how we can extend the functionality of the algorithm to tune both controllers simultaneously. 
